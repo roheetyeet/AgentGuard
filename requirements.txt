@@ -1,0 +1,6 @@
+anthropic>=0.40        # or swap for your preferred LLM provider
+python-dotenv>=1.0
+rich>=13.0             # pretty benchmark tables
+pytest>=8.0
+# Day 4: install separately when you need attack probes
+#   pip install garak
