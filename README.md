@@ -1,11 +1,7 @@
 # AgentGuard
 
-A security proxy that sits between an LLM agent and its tools, inspects every
-tool call, and enforces policy to stop prompt-injection-driven tool misuse.
-
-It is a *networking* artifact (an interceptor on the agent↔tool channel) and an
-*AI-security* artifact (taint tracking + injection detection + policy
-enforcement) at the same time.
+A security proxy between an LLM agent and its tools that inspects every
+tool call and enforces a policy to stop prompt-injection-driven tool misuse.
 
 ## The core idea
 
@@ -21,7 +17,7 @@ Any two of these is usually fine. All three is the "lethal trifecta" / a
 violation of the **Rule of Two**, and it's where indirect prompt injection turns
 into real damage. AgentGuard tracks these properties as *taint* on the agent's
 context and on each tool, and refuses tool calls that would complete the unsafe
-combination.
+combination. (Check references under `THREAT_MODEL.md`)
 
 ## Architecture
 
@@ -34,15 +30,15 @@ combination.
                                   (Rule of Two)    (injection scan)
 ```
 
-- `agentguard/agent.py`   — minimal tool-using agent loop (the subject under test)
-- `agentguard/tools.py`   — tools, each tagged with security metadata
-- `agentguard/guard.py`   — the interceptor: allow / block / escalate
-- `agentguard/policy.py`  — Rule-of-Two / taint-tracking decision logic  ← your work
-- `agentguard/detector.py`— injection detection on untrusted inputs        ← your work
-- `agentguard/logging_utils.py` — structured logging of every decision
-- `attacks/`              — the prompt-injection payloads you build (the "before")
-- `benchmarks/`           — runs attacks against guarded vs unguarded, prints results
-- `tests/`                — pytest sanity checks
+- `agentguard/agent.py`   — the subject under test
+- `agentguard/tools.py`   — tools, each with security metadata
+- `agentguard/guard.py`   — allow / block / escalate
+- `agentguard/policy.py`  — Rule-of-Two / taint-tracking decision logic
+- `agentguard/detector.py`— injection detection on untrusted inputs
+- `agentguard/logging_utils.py` — log decisions
+- `attacks/`              — the prompt-injection payloads
+- `benchmarks/`           — run attacks against guarded vs unguarded, print result
+- `tests/`                — pytest checks
 
 ## Quickstart
 
@@ -56,10 +52,8 @@ python -m benchmarks.run_benchmark      # guarded vs unguarded comparison
 
 ## Build plan (one week)
 
-- **Day 1** — read `THREAT_MODEL.md`, fill in the asset/attacker sections, skim code.
+- **Day 1** — read `THREAT_MODEL.md`, fill in the asset/attacker sections
 - **Day 2** — make `attacks/indirect_injection.py` actually hijack the agent.
 - **Day 3** — implement the TODOs in `policy.py` + `guard.py` so the attack is blocked.
-- **Day 4** — implement `detector.py`, wire in a few Garak probes, fill `benchmarks/`.
+- **Day 4** — implement `detector.py`, learn about and implement Garak probes, fill `benchmarks/`.
 - **Day 5** — fill `docs/writeup_template.md`, record a demo, push public.
-
-See the TODOs marked `# TODO(you):` throughout the code.
