@@ -1,3 +1,38 @@
+```
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║    ██╗     ██╗     ███╗   ███╗    ███████╗███████╗ ██████╗                  ║
+║    ██║     ██║     ████╗ ████║    ██╔════╝██╔════╝██╔════╝                  ║
+║    ██║     ██║     ██╔████╔██║    ███████╗█████╗  ██║                       ║
+║    ██║     ██║     ██║╚██╔╝██║    ╚════██║██╔══╝  ██║                       ║
+║    ███████╗███████╗██║ ╚═╝ ██║    ███████║███████╗╚██████╗                  ║
+║    ╚══════╝╚══════╝╚═╝     ╚═╝    ╚══════╝╚══════╝ ╚═════╝                  ║
+║                                                                              ║
+║              LLM Security: From Vulnerability to Defense                     ║
+║                                                                              ║
+║   A 10-project series addressing every OWASP Top 10 for LLM Applications.   ║
+║   Each repo is a standalone tool. All compose into a unified runtime.        ║
+║                                                                              ║
+║   01 ► AgentGuard         [ Prompt Injection          ] ◄ YOU ARE HERE       ║
+║   02 ► ContextShield       [ Sensitive Info Disclosure ]                     ║
+║   03 ► ChainVerify         [ Supply Chain              ]                     ║
+║   04 ► PoisonProbe         [ Data & Model Poisoning    ]                     ║
+║   05 ► SinkGuard           [ Improper Output Handling  ]                     ║
+║   06 ► CapAudit            [ Excessive Agency          ]                     ║
+║   07 ► PromptCanary        [ System Prompt Leakage     ]                     ║
+║   08 ► RAGShield           [ Vector & Embedding        ]                     ║
+║   09 ► GroundCheck         [ Misinformation            ]                     ║
+║   10 ► TokenGov            [ Unbounded Consumption     ]                     ║
+║                                                                              ║
+║   Root project & full architecture → github.com/roheetyeet/llm-sec          ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+```
+
+> **OWASP LLM01 — Prompt Injection** | Part of the LLM Sec series.
+> See the [root project](https://github.com/roheetyeet/llm-sec) for the full
+> architecture, how these tools compose, and the roadmap.
+
 # AgentGuard
 
 A content-blind security guard that sits between an LLM agent and its tools and
