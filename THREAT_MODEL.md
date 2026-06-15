@@ -1,4 +1,4 @@
-# AgentGuard — Threat Model (Day 1)
+# AgentGuard — Threat Model
 
 ## 1. System under protection
 A tool-using LLM agent that:
