@@ -1,23 +1,24 @@
 # AgentGuard
 
-A security proxy between an LLM agent and its tools that inspects every
-tool call and enforces a policy to stop prompt-injection-driven tool misuse.
+A content-blind security guard that sits between an LLM agent and its tools and
+enforces the **Rule of Two** (Meta) / **lethal trifecta** (Willison): no single
+agent run may simultaneously (a) ingest untrusted content, (b) access sensitive
+data, and (c) cause an external effect. Any two are fine; all three is the
+exploitable combination, so the guard blocks the call that would complete it.
 
-## The core idea
+The guard reasons only about *which of the three properties a run has
+accumulated*, never about tool arguments or text, which is what makes it
+robust to prompt injection regardless of how a payload is encoded.
 
-Modern agents are dangerous when a single request combines three things:
+## What's implemented
 
-1. **Untrusted input** — the agent reads attacker-influenced content (a web
-   page, a document, an email).
-2. **Sensitive data** — the agent can access private/secret data.
-3. **External effect** — the agent can act on the outside world (send, write,
-   call an API).
-
-Any two of these is usually fine. All three is the "lethal trifecta" / a
-violation of the **Rule of Two**, and it's where indirect prompt injection turns
-into real damage. AgentGuard tracks these properties as *taint* on the agent's
-context and on each tool, and refuses tool calls that would complete the unsafe
-combination. (Check references under `THREAT_MODEL.md`)
+- `agentguard/policy.py` — the Rule-of-Two engine (`evaluate` -> `PolicyResult`)
+- `agentguard/guard.py` — the interceptor: policy check before execution, then
+  defense-in-depth detection on untrusted output, then taint update
+- `agentguard/detector.py` — transparent heuristic injection scanner (advisory)
+- `agentguard/agent.py` — `ScriptedPlanner` (deterministic, default) and an
+  optional `LLMPlanner` (real Anthropic model)
+- `attacks/`, `benchmarks/`, `tests/` — the attack, the comparison table, tests
 
 ## Architecture
 
@@ -43,17 +44,27 @@ combination. (Check references under `THREAT_MODEL.md`)
 ## Quickstart
 
 ```bash
-python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env        # then put your API key in .env
-python -m attacks.indirect_injection   # see the unguarded agent get hijacked
-python -m benchmarks.run_benchmark      # guarded vs unguarded comparison
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt        # rich + pytest; both optional for core
+cp .env.example .env                    # only needed for the live LLM planner
+
+python -m attacks.indirect_injection    # before/after: leak, then blocked
+python -m benchmarks.run_benchmark       # guarded vs unguarded table
+pytest                                   # 10 tests (or: python -m pytest)
 ```
 
-## Build plan (one week)
+Everything except the optional live LLM mode runs **offline and deterministically**, no API key required, because the artifact under evaluation is the guard, not the model.
 
-- **Day 1** — read `THREAT_MODEL.md`, fill in the asset/attacker sections
-- **Day 2** — make `attacks/indirect_injection.py` actually hijack the agent.
-- **Day 3** — implement the TODOs in `policy.py` + `guard.py` so the attack is blocked.
-- **Day 4** — implement `detector.py`, learn about and implement Garak probes, fill `benchmarks/`.
-- **Day 5** — fill `docs/writeup_template.md`, record a demo, push public.
+## The four runnable claims
+
+1. Unguarded, the scripted exfiltration attack leaks the secret.
+2. Guarded, the identical attack is blocked at the `send` call.
+3. A benign read-then-send task is **not** blocked (the guard isn't over-broad).
+4. The policy decision is content-blind: it never inspects the message text.
+
+## Limitations / what's next
+
+- Run-scoped, flow-*insensitive* taint (binary flags, not per-value tracking).
+- Single agent. The research direction is multi-agent taint propagation and
+  replacing binary flags with contextual-integrity-style policies (cf. Conseca,
+  HotOS '25; Ghalebikesabi et al., CCS '24). See `docs/writeup_template.md`.

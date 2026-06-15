@@ -8,7 +8,6 @@ from dataclasses import dataclass, field
 from typing import Callable
 import os
 
-
 @dataclass
 class Tool:
     name: str
@@ -19,7 +18,6 @@ class Tool:
     sensitive_data: bool = False    # touches private/secret data
     external_effect: bool = False   # changes state outside the agent
     schema: dict = field(default_factory=dict)  # JSON schema for the LLM
-
 
 # --- Tool implementations -------------------------------------------------
 
@@ -33,11 +31,9 @@ def _read_document(url: str) -> str:
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
 
-
 def _get_secret() -> str:
     """Returns a sensitive value the attacker wants to exfiltrate."""
     return os.environ.get("AGENT_SECRET", "sk-demo-do-not-leak-1234")
-
 
 def _send(message: str) -> str:
     """Simulated external effect (e.g., send an email / POST to a URL).
@@ -45,7 +41,6 @@ def _send(message: str) -> str:
     """
     # In the demo this just records the attempt; the *attempt* is the breach.
     return f"[SENT] {message}"
-
 
 # --- Registry -------------------------------------------------------------
 
